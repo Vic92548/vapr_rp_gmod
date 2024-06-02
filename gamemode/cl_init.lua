@@ -10,6 +10,7 @@ include("client/cl_hud.lua")
 include("modules/notifications/init.lua")
 include("modules/stats/init.lua")
 include("modules/inventory/init.lua")
+include("modules/shop/init.lua")
 include("modules/character_creator/init.lua")
 include("modules/weapon_hud/init.lua")
 

@@ -149,6 +149,7 @@ function PurchaseItem(ply, item, stat, cost)
     end
 
     RemoveStat(ply, stat, cost)
+    AddItemToInventory(ply, item)
     ply:ChatPrint("You have purchased " .. item .. " for " .. cost .. " " .. stat .. ".")
     log("Player " .. steamID .. " purchased " .. item .. " for " .. cost .. " " .. stat .. ".")
     return true

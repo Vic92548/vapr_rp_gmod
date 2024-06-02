@@ -20,6 +20,7 @@ include("modules/weapon_hud/init.lua")
 include("modules/stats/init.lua")
 
 include("modules/inventory/init.lua")
+include("modules/shop/init.lua")
 
 -- character_creator
 include("modules/character_creator/init.lua")

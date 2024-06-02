@@ -1,8 +1,3 @@
-local frame
-local modelSelector
-local modelPreview
-local fieldEntries = {}
-
 surface.CreateFont("InterFont", {
     font = "Inter Regular",
     size = 19,
@@ -10,9 +5,35 @@ surface.CreateFont("InterFont", {
     antialias = true
 })
 
-local function FilterModels(sex, age)
-    local ageCategory = age < 18 and "Child" or "Adult"
-    return VAPR_CHARACTER_CREATOR_CONFIG.models[sex][ageCategory] or {}
+local frame
+local modelSelector
+local modelPreview
+local fieldEntries = {}
+
+local function FilterModels()
+    local filteredModels = {}
+
+    for _, model in ipairs(VAPR_CHARACTER_CREATOR_CONFIG.models) do
+        local match = true
+        for fieldName, entry in pairs(fieldEntries) do
+            local value = entry:GetValue()
+            local modelValue = model[fieldName:lower()]
+            
+            if value and value ~= "" and modelValue and tostring(modelValue) ~= tostring(value) then
+                match = false
+                break
+            end
+        end
+
+        if match then
+            table.insert(filteredModels, model.path)
+        end
+    end
+
+    print("Filtering models with the selected criteria")
+    PrintTable(filteredModels)
+
+    return filteredModels
 end
 
 local function UpdateModelPreview(modelPath)
@@ -22,24 +43,56 @@ local function UpdateModelPreview(modelPath)
 end
 
 local function UpdateModelSelector()
-    local sex = fieldEntries["Sex"] and fieldEntries["Sex"]:GetSelected()
-    local age = tonumber(fieldEntries["Age"] and fieldEntries["Age"]:GetValue())
+    print("Updating model selector with current selections")
 
-    if sex and age then
-        modelSelector:Clear()
-        for _, model in ipairs(FilterModels(sex, age)) do
-            local icon = vgui.Create("DModelPanel", modelSelector)
-            icon:SetSize(75, 75)
-            icon:SetModel(model)
-            icon:SetFOV(60)
-            icon:SetCamPos(Vector(35, 0, 55))
-            icon:SetLookAt(Vector(0, 0, 55))
-            icon.DoClick = function()
-                UpdateModelPreview(model)
-            end
+    modelSelector:Clear()
+    local models = FilterModels()
+    if #models == 0 then
+        notification.AddLegacy("No models available for the selected criteria.", NOTIFY_ERROR, 5)
+        return
+    end
+
+    local panelWidth = modelSelector:GetWide()
+    local panelHeight = modelSelector:GetTall()
+    local spacing = 10
+
+    -- Calculate number of columns dynamically based on panel width and icon size
+    local columns = math.floor(panelWidth / (75 + spacing))
+    if columns < 1 then columns = 1 end -- Ensure at least one column
+
+    local iconSize = (panelWidth - (columns + 1) * spacing) / columns
+
+    local xPos, yPos = spacing, spacing
+
+    for index, modelPath in ipairs(models) do
+        local icon = vgui.Create("DModelPanel", modelSelector)
+        icon:SetSize(iconSize, iconSize)
+        icon:SetModel(modelPath)
+        icon:SetFOV(60)
+        icon:SetCamPos(Vector(35, 0, 55))
+        icon:SetLookAt(Vector(0, 0, 55))
+
+        -- Prevent model rotation
+        function icon:LayoutEntity(ent)
+            -- Disable rotation
+        end
+
+        icon:SetPos(xPos, yPos)
+
+        icon.DoClick = function()
+            UpdateModelPreview(modelPath)
+        end
+
+        xPos = xPos + iconSize + spacing
+        if (index % columns) == 0 then
+            xPos = spacing
+            yPos = yPos + iconSize + spacing
         end
     end
 end
+
+
+
 
 local function OpenCharacterCreator()
     frame = vgui.Create("DFrame")
@@ -50,7 +103,6 @@ local function OpenCharacterCreator()
 
     frame.Paint = function(self, w, h)
         draw.RoundedBox(0, 0, 0, w, h, Color(27, 40, 56, 255))
-        draw.RoundedBox(0, 0, 0, w, 30, Color(59, 130, 246, 255))
     end
 
     modelPreview = vgui.Create("DModelPanel", frame)
@@ -185,4 +237,9 @@ end)
 hook.Add("InitPostEntity", "VAPR_ClientReady", function()
     net.Start("VAPR_ClientReady")
     net.SendToServer()
+end)
+
+-- Register the console command to open the character creator
+concommand.Add("open_character_creator", function()
+    OpenCharacterCreator()
 end)

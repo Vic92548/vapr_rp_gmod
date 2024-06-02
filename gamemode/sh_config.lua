@@ -73,14 +73,66 @@ VAPR_ITEMS_CONFIG = {
     }
 }
 
-VAPR_SHOP_CONFIG = {
-
+VAPR_CURRENCIES_CONFIG = {
+    money = {
+        symbol = "$",
+        displayOnHUD = true
+    }
 }
+
+VAPR_SHOPS_CONFIG = {
+    shop1 = {
+        name = "General Store",
+        color = Color(59, 130, 246, 255), -- Couleur configurable
+        categories = {
+            health = {
+                name = "Health Items",
+                items = {
+                    health_pack = {
+                        buy_price = 100,
+                        sell_price = 50
+                    }
+                }
+            },
+            food = {
+                name = "Food Items",
+                items = {
+                    food_item = {
+                        buy_price = 50,
+                        sell_price = 25
+                    }
+                }
+            }
+        }
+    },
+    shop2 = {
+        name = "Weapons Shop",
+        color = Color(27, 40, 56, 255), -- Couleur configurable
+        categories = {
+            weapons = {
+                name = "Weapons",
+                items = {
+                    shotgun = {
+                        buy_price = 500,
+                        sell_price = 250
+                    },
+                    crossbow = {
+                        buy_price = 750,
+                        sell_price = 375
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 -- Configuration pour le créateur de personnage
 VAPR_CHARACTER_CREATOR_CONFIG = {
     -- Champs disponibles pour la création de personnage
     fields = {
+        {name= "Type", type= "ComboBox", options= {"Human", "Undead", "Alien"}},
+        {name= "Faction", type= "ComboBox", options= {"Citizens", "Rebels", "Bad Guys"}},
         {name = "Sex", type = "ComboBox", options = {"Male", "Female"}},
         {name = "Age", type = "NumberWang"},
         {name = "First Name", type = "TextEntry"},
@@ -88,27 +140,111 @@ VAPR_CHARACTER_CREATOR_CONFIG = {
     },
     -- Modèles de personnages disponibles classés par sexe et tranche d'âge
     models = {
-        Male = {
-            Adult = {
-                "models/player/Group01/male_01.mdl",
-                "models/player/Group01/male_02.mdl",
-                "models/player/Group01/male_03.mdl"
-            },
-            Child = {
-                "models/player/child/male_01.mdl"
-                -- Ajouter d'autres modèles d'enfants masculins si disponibles
-            }
+        {
+            type = "Undead",
+            path = "models/Humans/corpse1.mdl"
         },
-        Female = {
-            Adult = {
-                "models/player/Group01/female_01.mdl",
-                "models/player/Group01/female_02.mdl",
-                "models/player/Group01/female_03.mdl"
-            },
-            Child = {
-                "models/player/child/female_01.mdl"
-                -- Ajouter d'autres modèles d'enfants féminins si disponibles
-            }
-        }
+        {
+            type = "Alien",
+            path = "models/vortigaunt.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Citizens",
+            sex = "Male",
+            path = "models/Humans/Group01/male_02.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Citizens",
+            sex = "Male",
+            path = "models/Humans/Group01/male_03.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Citizens",
+            sex = "Male",
+            path = "models/Humans/Group01/Male_04.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Citizens",
+            sex = "Male",
+            path = "models/Humans/Group01/Male_05.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Citizens",
+            sex = "Female",
+            path = "models/Humans/Group01/Female_01.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Citizens",
+            sex = "Female",
+            path = "models/Humans/Group01/Female_02.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Citizens",
+            sex = "Female",
+            path = "models/Humans/Group01/Female_03.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Rebels",
+            sex = "Male",
+            path = "models/Humans/Group03/Male_01.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Rebels",
+            sex = "Male",
+            path = "models/Humans/Group03/male_02.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Rebels",
+            sex = "Male",
+            path = "models/Humans/Group03/male_03.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Rebels",
+            sex = "Female",
+            path = "models/Humans/Group03/Female_01.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Rebels",
+            sex = "Female",
+            path = "models/Humans/Group03/Female_02.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Rebels",
+            sex = "Female",
+            path = "models/Humans/Group03/Female_03.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Bad Guys",
+            path = "models/Police.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Bad Guys",
+            path = "models/Combine_Soldier.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Bad Guys",
+            path = "models/Combine_Soldier_PrisonGuard.mdl"
+        },
+        {
+            type = "Human",
+            faction = "Bad Guys",
+            path = "models/Combine_Super_Soldier.mdl"
+        },
     },
 }
