@@ -13,7 +13,10 @@ include("sv_config.lua")
 include("player.lua")
 
 
+
 -- MODULES
+include("modules/notifications/init.lua")
+include("modules/weapon_hud/init.lua")
 include("modules/stats/init.lua")
 
 include("modules/inventory/init.lua")

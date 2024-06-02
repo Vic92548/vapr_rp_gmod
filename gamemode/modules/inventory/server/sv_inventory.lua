@@ -18,11 +18,30 @@ function AddItemToInventory(ply, itemKey)
     local itemConfig = VAPR_ITEMS_CONFIG[itemKey]
     if not itemConfig then return end
 
+    local weight = GetStat(ply, "weight")
+
+    if weight then
+        if itemConfig.weight then
+            if not CanAddStat(ply, "weight", itemConfig.weight) then
+                notifyPlayer(ply, "You are full, you can't collect one ".. itemConfig.name)
+                return false
+            end
+        end    
+    end
+
     for _, item in ipairs(inventory) do
         if item.key == itemKey then
             item.quantity = item.quantity + 1
+
+            if weight then
+                if itemConfig.weight then
+                    AddStat(ply, "weight", itemConfig.weight)
+                end    
+            end
+
+            notifyPlayer(ply, "You collected one ".. item.name.. " you now have ".. item.quantity)
             SendUpdateInventory(ply)
-            return
+            return true
         end
     end
 
@@ -30,6 +49,7 @@ function AddItemToInventory(ply, itemKey)
         key = itemKey,
         name = itemConfig.name,
         stat = itemConfig.stat,
+        weight = itemConfig.weight,
         description = itemConfig.description,
         model = itemConfig.model,
         function_type = itemConfig.function_type,
@@ -37,7 +57,15 @@ function AddItemToInventory(ply, itemKey)
         quantity = 1
     })
 
+    if weight then
+        if itemConfig.weight then
+            AddStat(ply, "weight", itemConfig.weight)
+        end    
+    end
+
+    notifyPlayer(ply, "You collected one ".. itemConfig.name)
     SendUpdateInventory(ply)
+    return true
 end
 
 function RemoveItemFromInventory(ply, itemKey, quantity)
@@ -47,6 +75,11 @@ function RemoveItemFromInventory(ply, itemKey, quantity)
         if item.key == itemKey then
             item.quantity = item.quantity - (quantity or 1)
             if item.quantity <= 0 then
+
+                if item.weight then
+                    RemoveStat(ply, "weight", item.weight)
+                end
+
                 table.remove(inventory, i)
             end
             break
@@ -84,15 +117,29 @@ function DropItem(ply, itemKey)
     local inventory = GetPlayerInventory(ply)
     for _, item in ipairs(inventory) do
         if item.key == itemKey then
-            local itemEntity = ents.Create("prop_physics")
+            local itemEntity = ents.Create("vapr_item_entity")
             itemEntity:SetModel(item.model)
-            itemEntity:SetPos(ply:GetPos() + Vector(0, 0, 50))
+            itemEntity:SetItemKey(itemKey)
+            itemEntity:SetPos(ply:GetPos() + ply:GetForward() * 50)
             itemEntity:Spawn()
             RemoveItemFromInventory(ply, itemKey)
             break
         end
     end
 end
+
+util.AddNetworkString("AddVAPRItemToInventory")
+
+net.Receive("AddVAPRItemToInventory", function(len, ply)
+    local entity = net.ReadEntity()
+    if IsValid(entity) and entity:GetClass() == "vapr_item_entity" then
+        local itemKey = entity:GetItemKey()
+        if itemKey then
+            AddItemToInventory(ply, itemKey)
+            entity:Remove()
+        end
+    end
+end)
 
 hook.Add("PlayerInitialSpawn", "InitializePlayerInventory", function(ply)
     playerInventories[ply:SteamID()] = playerInventories[ply:SteamID()] or {}

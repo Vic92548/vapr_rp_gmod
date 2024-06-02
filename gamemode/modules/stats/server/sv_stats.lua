@@ -5,7 +5,9 @@ playerStats = {}
 statLimits = VAPR_STATS_CONFIG.limits
 
 local function log(message)
-    print("[StatsSystem] " .. message)
+    if VAPR_STATS_CONFIG.DEBUG then
+        print("[StatsSystem] " .. message)
+    end   
 end
 
 -- Initialize player stats when they join
@@ -46,6 +48,25 @@ function AddStat(ply, stat, amount)
     log("Added " .. amount .. " to " .. stat .. " for player: " .. steamID .. ". Old value: " .. oldValue .. ", New value: " .. newValue)
     TriggerStatChangeEvent(ply, stat, oldValue, newValue)
     UpdateClientStats(ply)
+end
+
+function CanAddStat(ply, stat, amount)
+    local steamID = ply:SteamID()
+    if not playerStats[steamID] or not playerStats[steamID][stat] then return false end
+
+    local limits = statLimits[stat]
+    local oldValue = playerStats[steamID][stat]
+    local newValue = oldValue + amount
+
+    if limits.max > 0 then
+        if newValue > limits.max then
+            return false
+        else
+            return true
+        end
+    end
+
+    return true
 end
 
 -- Function to remove value from a stat

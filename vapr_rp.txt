@@ -1,7 +1,7 @@
 "vapr_rp"
 {
     "base"    "base"
-    "title"   "VAPR RolePlay"
+    "title"   "VAPR RolePlay | discord.gg/vapr"
     "maps"    "^rp_"
     "icon"    "vapr_rp/icon24.png"
 }

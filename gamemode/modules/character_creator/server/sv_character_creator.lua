@@ -12,11 +12,28 @@ net.Receive("VAPR_CreateCharacter", function(len, ply)
     local characterData = net.ReadTable()
     local model = characterData.model
 
-    -- Verify the model belongs to the selected sex and age category
+    -- Verify the presence of essential data
+    if not model or not characterData.fields or not characterData.fields["Sex"] or not characterData.fields["Age"] then
+        net.Start("VAPR_CharacterCreated")
+        net.WriteBool(false)
+        net.Send(ply)
+        return
+    end
+
     local sex = characterData.fields["Sex"]
     local age = tonumber(characterData.fields["Age"])
+    
+    -- Validate the sex and age values
+    if not (sex == "Male" or sex == "Female") or not age then
+        net.Start("VAPR_CharacterCreated")
+        net.WriteBool(false)
+        net.Send(ply)
+        return
+    end
+
     local validModels = FilterModels(sex, age)
 
+    -- Verify the model belongs to the selected sex and age category
     if table.HasValue(validModels, model) then
         ply:SetModel(model)
         playersWithCharacters[ply:SteamID()] = characterData.fields

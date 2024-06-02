@@ -1,12 +1,15 @@
 VAPR_STATS_CONFIG = {
     limits = {
-        money = {default = 1000, min = 0, max = 0, changeOverTime = 0, visible = true},  -- max 0 means no maximum
-        health = {default = 100, min = 0, max = 100, changeOverTime = 0, visible = true},
-        stamina = {default = 100, min = 0, max = 100, changeOverTime = 0, visible = true},
-        stamina = {default = 100, min = 0, max = 100, changeOverTime = 0, visible = true},
-        hunger = {default = 100, min = 0, max = 100, changeOverTime = -5, visible = true},
+        money = {default = 1000, min = 0, max = 0, changeOverTime = 0, visible = false},  -- max 0 means no maximum
+        health = {default = 100, min = 0, max = 100, changeOverTime = 0, visible = false},
+        weight = {default = 0, min = 0, max = 400, changeOverTime = 0, visible = false},
+        stamina = {default = 100, min = 0, max = 100, changeOverTime = 0, visible = false},
+        hunger = {default = 100, min = 0, max = 100, changeOverTime = -5, visible = false},
+        strength = {default = 1, min = 0, max = 100, changeOverTime = 0, visible = true},
+        agility = {default = 1, min = 0, max = 100, changeOverTime = 0, visible = true},
         wanted_level = {default = 0, min = 0, max = 100000000, changeOverTime = -50, visible = true}
-    }
+    },
+    DEBUG = false
 }
 
 VAPR_ITEMS_CONFIG = {
@@ -14,6 +17,7 @@ VAPR_ITEMS_CONFIG = {
     health_pack = {
         name = "Health Pack",
         value = 50, -- Amount of health it restores
+        weight = 50,
         function_type = "health", -- Type of function
         model = "models/items/healthkit.mdl", -- Path to the model
         description = "Restores 50 health points."
@@ -23,6 +27,7 @@ VAPR_ITEMS_CONFIG = {
     food_item = {
         name = "Food Item",
         value = 25, -- Amount of food it restores
+        weight = 200,
         stat = "hunger",
         model = "models/props_c17/oildrum001.mdl", -- Path to the model (example)
         description = "Restores 25 food points."
@@ -41,6 +46,7 @@ VAPR_ITEMS_CONFIG = {
     shotgun = {
         name = "Shotgun",
         value = "weapon_shotgun", -- Example value for the weapon
+        weight = 300,
         function_type = "weapon", -- Type of function
         model = "models/weapons/c_shotgun.mdl", -- Path to the model
         description = "THE SHOOOTGUN"
@@ -49,6 +55,7 @@ VAPR_ITEMS_CONFIG = {
     crossbow = {
         name = "Crossbow",
         value = "weapon_crossbow", -- Example value for the weapon
+        weight = 80,
         function_type = "weapon", -- Type of function
         model = "models/weapons/w_crossbow.mdl", -- Path to the model
         description = "A power weapon"
@@ -70,15 +77,16 @@ VAPR_SHOP_CONFIG = {
 
 }
 
+-- Configuration pour le créateur de personnage
 VAPR_CHARACTER_CREATOR_CONFIG = {
-    -- Available fields for character creation
+    -- Champs disponibles pour la création de personnage
     fields = {
         {name = "Sex", type = "ComboBox", options = {"Male", "Female"}},
         {name = "Age", type = "NumberWang"},
         {name = "First Name", type = "TextEntry"},
         {name = "Last Name", type = "TextEntry"}
     },
-    -- Available character models categorized by sex and age range
+    -- Modèles de personnages disponibles classés par sexe et tranche d'âge
     models = {
         Male = {
             Adult = {
@@ -88,7 +96,7 @@ VAPR_CHARACTER_CREATOR_CONFIG = {
             },
             Child = {
                 "models/player/child/male_01.mdl"
-                -- Add more child male models if available
+                -- Ajouter d'autres modèles d'enfants masculins si disponibles
             }
         },
         Female = {
@@ -99,8 +107,8 @@ VAPR_CHARACTER_CREATOR_CONFIG = {
             },
             Child = {
                 "models/player/child/female_01.mdl"
-                -- Add more child female models if available
+                -- Ajouter d'autres modèles d'enfants féminins si disponibles
             }
         }
-    }
+    },
 }
