@@ -34,7 +34,9 @@ local function DrawPlayerStats()
         if limits.visible then
             local value = playerStats[stat] or limits.default
             if limits.min ~= limits.max then
+                
                 DrawProgressBar(x, y, 200, 25, limits.min, limits.max, value, Color(0, 204, 255, 255)) -- Vercel cyan color
+                draw.SimpleText(stat, "HUDNumber5", x, y, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
             else
                 draw.SimpleText(stat .. ": " .. value, "HUDNumber5", x, y, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
             end

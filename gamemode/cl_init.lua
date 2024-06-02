@@ -8,6 +8,7 @@ include("client/cl_hud.lua")
 
 -- MODULES
 include("modules/stats/init.lua")
+include("modules/inventory/init.lua")
 include("modules/character_creator/init.lua")
 
 function GM:Initialize()

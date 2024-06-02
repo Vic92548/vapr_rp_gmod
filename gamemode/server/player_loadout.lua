@@ -13,7 +13,13 @@ local function SetPlayerLoadout(ply)
     ply:SetAmmo(50, "Pistol")
     ply:SetAmmo(100, "RPG")
 
-    ply:Give("item_healthkit")
+
+    AddItemToInventory(ply, "health_pack")
+    AddItemToInventory(ply, "health_pack")
+    AddItemToInventory(ply, "food_item")
+    AddItemToInventory(ply, "shotgun")
+    AddItemToInventory(ply, "crossbow")
+    AddItemToInventory(ply, "armor_item")
 end
 
 hook.Add("PlayerLoadout", "CustomPlayerLoadout", SetPlayerLoadout)

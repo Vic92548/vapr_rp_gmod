@@ -1,3 +1,4 @@
+-- init.lua
 resource.AddFile("resource/fonts/Inter-Regular.ttf")
 resource.AddFile("resource/fonts/Inter-Bold.ttf")
 
@@ -9,23 +10,21 @@ AddCSLuaFile("shared/shared.lua")
 
 include("sh_config.lua")
 include("sv_config.lua")
+include("player.lua")
+
 
 -- MODULES
 include("modules/stats/init.lua")
+
+include("modules/inventory/init.lua")
 
 -- character_creator
 include("modules/character_creator/init.lua")
 
 include("shared/shared.lua")
 
-function GM:Initialize()
-    self.BaseClass.Initialize(self)
-end
-
 -- Include the player loadout script
 include("server/player_loadout.lua")
 
 -- Other initialization code
-
--- init.lua
-
+include("admin.lua")
