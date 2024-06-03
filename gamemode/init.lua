@@ -21,6 +21,8 @@ include("modules/stats/init.lua")
 
 include("modules/inventory/init.lua")
 include("modules/shop/init.lua")
+include("modules/next_hud/init.lua")
+include("modules/hunger_system/init.lua")
 
 -- character_creator
 include("modules/character_creator/init.lua")

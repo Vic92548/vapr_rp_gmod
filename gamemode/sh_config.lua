@@ -142,7 +142,7 @@ VAPR_CHARACTER_CREATOR_CONFIG = {
     models = {
         {
             type = "Undead",
-            path = "models/Humans/corpse1.mdl"
+            path = "models/player/corpse1.mdl"
         },
         {
             type = "Alien",
@@ -152,99 +152,115 @@ VAPR_CHARACTER_CREATOR_CONFIG = {
             type = "Human",
             faction = "Citizens",
             sex = "Male",
-            path = "models/Humans/Group01/male_02.mdl"
+            path = "models/player/Group01/male_02.mdl"
         },
         {
             type = "Human",
             faction = "Citizens",
             sex = "Male",
-            path = "models/Humans/Group01/male_03.mdl"
+            path = "models/player/Group01/male_03.mdl"
         },
         {
             type = "Human",
             faction = "Citizens",
             sex = "Male",
-            path = "models/Humans/Group01/Male_04.mdl"
+            path = "models/player/Group01/Male_04.mdl"
         },
         {
             type = "Human",
             faction = "Citizens",
             sex = "Male",
-            path = "models/Humans/Group01/Male_05.mdl"
+            path = "models/player/Group01/Male_05.mdl"
         },
         {
             type = "Human",
             faction = "Citizens",
             sex = "Female",
-            path = "models/Humans/Group01/Female_01.mdl"
+            path = "models/player/Group01/Female_01.mdl"
         },
         {
             type = "Human",
             faction = "Citizens",
             sex = "Female",
-            path = "models/Humans/Group01/Female_02.mdl"
+            path = "models/player/Group01/Female_02.mdl"
         },
         {
             type = "Human",
             faction = "Citizens",
             sex = "Female",
-            path = "models/Humans/Group01/Female_03.mdl"
+            path = "models/player/Group01/Female_03.mdl"
         },
         {
             type = "Human",
             faction = "Rebels",
             sex = "Male",
-            path = "models/Humans/Group03/Male_01.mdl"
+            path = "models/player/Group03/Male_01.mdl"
         },
         {
             type = "Human",
             faction = "Rebels",
             sex = "Male",
-            path = "models/Humans/Group03/male_02.mdl"
+            path = "models/player/Group03/male_02.mdl"
         },
         {
             type = "Human",
             faction = "Rebels",
             sex = "Male",
-            path = "models/Humans/Group03/male_03.mdl"
+            path = "models/player/Group03/male_03.mdl"
         },
         {
             type = "Human",
             faction = "Rebels",
             sex = "Female",
-            path = "models/Humans/Group03/Female_01.mdl"
+            path = "models/player/Group03/Female_01.mdl"
         },
         {
             type = "Human",
             faction = "Rebels",
             sex = "Female",
-            path = "models/Humans/Group03/Female_02.mdl"
+            path = "models/player/Group03/Female_02.mdl"
         },
         {
             type = "Human",
             faction = "Rebels",
             sex = "Female",
-            path = "models/Humans/Group03/Female_03.mdl"
+            path = "models/player/Group03/Female_03.mdl"
         },
         {
             type = "Human",
             faction = "Bad Guys",
-            path = "models/Police.mdl"
+            path = "models/player/Police.mdl"
         },
         {
             type = "Human",
             faction = "Bad Guys",
-            path = "models/Combine_Soldier.mdl"
+            path = "models/player/Combine_Soldier.mdl"
         },
         {
             type = "Human",
             faction = "Bad Guys",
-            path = "models/Combine_Soldier_PrisonGuard.mdl"
+            path = "models/player/Combine_Soldier_PrisonGuard.mdl"
         },
         {
             type = "Human",
             faction = "Bad Guys",
-            path = "models/Combine_Super_Soldier.mdl"
+            path = "models/player/Combine_Super_Soldier.mdl"
         },
     },
 }
+
+NextHUD_config = {
+    ShowHealthBar = true,
+    ShowArmorBar = true,
+    ShowAmmo = true,
+    ShowVehicleHUD = true,
+    Show3DDoorInfo = true,
+    ShowGesturesMenu = true
+}
+
+VAPR_HungerConfig = {
+    damagePerSecond = 0, -- Damage per second when hunger is at 0
+    decayInterval = 1,   -- Interval in seconds for hunger reduction
+    hungerDecrease = 360   -- Hunger points lost per interval
+}
+
