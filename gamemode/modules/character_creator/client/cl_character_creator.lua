@@ -5,10 +5,31 @@ surface.CreateFont("InterFont", {
     antialias = true
 })
 
+local blackColor = Color(27, 40, 56, 255)
+local blueColor = Color(59, 130, 246, 255)
+local whiteColor = Color(220, 220, 220, 255)
+
+local defaultModel = "models/player/kleiner.mdl" -- Default model path
+
+local steps = {}
+local currentStep = 1
 local frame
-local modelSelector
 local modelPreview
 local fieldEntries = {}
+local modelSelector
+
+local function ShowStep(step)
+    for i, panel in ipairs(steps) do
+        panel:SetVisible(i == step)
+    end
+end
+
+local function PreviousStep()
+    if currentStep > 1 then
+        currentStep = currentStep - 1
+        ShowStep(currentStep)
+    end
+end
 
 local function FilterModels()
     local filteredModels = {}
@@ -18,7 +39,7 @@ local function FilterModels()
         for fieldName, entry in pairs(fieldEntries) do
             local value = entry:GetValue()
             local modelValue = model[fieldName:lower()]
-            
+
             if value and value ~= "" and modelValue and tostring(modelValue) ~= tostring(value) then
                 match = false
                 break
@@ -48,12 +69,11 @@ local function UpdateModelSelector()
     modelSelector:Clear()
     local models = FilterModels()
     if #models == 0 then
-        notification.AddLegacy("No models available for the selected criteria.", NOTIFY_ERROR, 5)
-        return
+        notification.AddLegacy("No models available for the selected criteria. Displaying default model.", NOTIFY_ERROR, 5)
+        models = {defaultModel} -- Use default model if no models match the criteria
     end
 
     local panelWidth = modelSelector:GetWide()
-    local panelHeight = modelSelector:GetTall()
     local spacing = 10
 
     -- Calculate number of columns dynamically based on panel width and icon size
@@ -91,97 +111,75 @@ local function UpdateModelSelector()
     end
 end
 
+local function NextStep()
+    if currentStep < #steps then
+        currentStep = currentStep + 1
+        ShowStep(currentStep)
 
+        if currentStep == #steps then
+            UpdateModelSelector()
+        end
+    end
+end
 
-
-local function OpenCharacterCreator()
-    frame = vgui.Create("DFrame")
-    frame:SetTitle("Character Creator")
-    frame:SetSize(ScrW(), ScrH()) -- Set the frame to be fullscreen
-    frame:Center()
-    frame:MakePopup()
-
-    frame.Paint = function(self, w, h)
-        draw.RoundedBox(0, 0, 0, w, h, Color(27, 40, 56, 255))
+local function CreateStep(labelText, fields)
+    local panel = vgui.Create("DPanel", frame)
+    panel:SetSize(frame:GetWide(), frame:GetTall())
+    panel:SetVisible(false)
+    panel.Paint = function(self, w, h)
+        draw.RoundedBox(0, 0, 0, w, h, blackColor)
     end
 
-    modelPreview = vgui.Create("DModelPanel", frame)
-    modelPreview:SetPos(50, 50)
-    modelPreview:SetSize(400, ScrH() - 100) -- Adjust the height to fit fullscreen
-    modelPreview:SetFOV(45)
-    modelPreview:SetCamPos(Vector(50, 50, 50))
-    modelPreview:SetLookAt(Vector(0, 0, 35))
-    modelPreview:SetModel("models/player/kleiner.mdl")
-
-    local label = vgui.Create("DLabel", frame)
-    label:SetPos(ScrW() - 500, 50)
-    label:SetText("Select your character model:")
-    label:SetSize(450, 35) -- Adjust the width
-    label:SetTextColor(Color(220, 220, 220, 255))
+    local label = vgui.Create("DLabel", panel)
+    label:SetPos(50, 50)
+    label:SetText(labelText)
+    label:SetTextColor(whiteColor)
     label:SetFont("InterFont")
+    label:SizeToContents()
 
-    modelSelector = vgui.Create("DScrollPanel", frame)
-    modelSelector:SetPos(ScrW() - 500, 90)
-    modelSelector:SetSize(450, 200) -- Adjust the width
-    modelSelector.Paint = function(self, w, h)
-        draw.RoundedBox(4, 0, 0, w, h, Color(59, 130, 246, 255))
-    end
-
-    local yPos = 300
-    for _, field in ipairs(VAPR_CHARACTER_CREATOR_CONFIG.fields) do
-        local fieldLabel = vgui.Create("DLabel", frame)
-        fieldLabel:SetPos(ScrW() - 500, yPos)
+    local yPos = 100
+    for _, field in ipairs(fields) do
+        local fieldLabel = vgui.Create("DLabel", panel)
+        fieldLabel:SetPos(50, yPos)
         fieldLabel:SetText(field.name .. ":")
-        fieldLabel:SetTextColor(Color(220, 220, 220, 255))
+        fieldLabel:SetTextColor(whiteColor)
         fieldLabel:SetFont("InterFont")
         fieldLabel:SizeToContents()
-        fieldLabel:SetWide(math.min(fieldLabel:GetWide(), 200))
-        fieldLabel:SetContentAlignment(5)
-
         yPos = yPos + 25
 
         if field.type == "ComboBox" then
-            local comboBox = vgui.Create("DComboBox", frame)
-            comboBox:SetPos(ScrW() - 500, yPos)
-            comboBox:SetSize(450, 35) -- Adjust the width
-            comboBox:SetTextColor(Color(220, 220, 220, 255))
+            local comboBox = vgui.Create("DComboBox", panel)
+            comboBox:SetPos(50, yPos)
+            comboBox:SetSize(450, 35)
+            comboBox:SetTextColor(whiteColor)
             comboBox:SetFont("InterFont")
             comboBox.Paint = function(self, w, h)
-                draw.RoundedBox(4, 0, 0, w, h, Color(59, 130, 246, 255))
+                draw.RoundedBox(4, 0, 0, w, h, blueColor)
             end
             for _, option in ipairs(field.options) do
                 comboBox:AddChoice(option)
             end
-            comboBox.OnSelect = function()
-                UpdateModelSelector()
-            end
             fieldEntries[field.name] = comboBox
         elseif field.type == "TextEntry" then
-            local textEntry = vgui.Create("DTextEntry", frame)
-            textEntry:SetPos(ScrW() - 500, yPos)
-            textEntry:SetSize(450, 35) -- Adjust the width
-            textEntry:SetTextColor(Color(220, 220, 220, 255))
+            local textEntry = vgui.Create("DTextEntry", panel)
+            textEntry:SetPos(50, yPos)
+            textEntry:SetSize(450, 35)
+            textEntry:SetTextColor(whiteColor)
             textEntry:SetFont("InterFont")
             textEntry.Paint = function(self, w, h)
-                draw.RoundedBox(4, 0, 0, w, h, Color(59, 130, 246, 255))
-                self:DrawTextEntryText(Color(220, 220, 220, 255), self:GetHighlightColor(), self:GetCursorColor())
-            end
-            textEntry.OnChange = function()
-                UpdateModelSelector()
+                draw.RoundedBox(4, 0, 0, w, h, blueColor)
+                self:DrawTextEntryText(whiteColor, self:GetHighlightColor(), self:GetCursorColor())
             end
             fieldEntries[field.name] = textEntry
         elseif field.type == "NumberWang" then
-            local numberWang = vgui.Create("DNumberWang", frame)
-            numberWang:SetPos(ScrW() - 500, yPos)
-            numberWang:SetSize(450, 35) -- Adjust the width
-            numberWang:SetTextColor(Color(220, 220, 220, 255))
+            local numberWang = vgui.Create("DNumberWang", panel)
+            numberWang:SetPos(50, yPos)
+            numberWang:SetSize(450, 35)
+            numberWang:SetTextColor(whiteColor)
             numberWang:SetFont("InterFont")
             numberWang.Paint = function(self, w, h)
-                draw.RoundedBox(4, 0, 0, w, h, Color(59, 130, 246, 255))
-                self:DrawTextEntryText(Color(220, 220, 220, 255), self:GetHighlightColor(), self:GetCursorColor())
-            end
-            numberWang.OnValueChange = function()
-                UpdateModelSelector()
+                draw.RoundedBox(4, 0, 0, w, h, blueColor)
+                self:DrawTextEntryText(whiteColor, self:GetHighlightColor(), self:GetCursorColor())
             end
             fieldEntries[field.name] = numberWang
         end
@@ -189,16 +187,93 @@ local function OpenCharacterCreator()
         yPos = yPos + 50
     end
 
-    local submitButton = vgui.Create("DButton", frame)
-    submitButton:SetPos(ScrW() / 2 - 75, ScrH() - 100)
-    submitButton:SetSize(150, 40)
-    submitButton:SetText("Create Character")
-    submitButton:SetTextColor(Color(220, 220, 220, 255))
-    submitButton:SetFont("InterFont")
-    submitButton.Paint = function(self, w, h)
-        draw.RoundedBox(4, 0, 0, w, h, Color(59, 130, 246, 255))
+    local prevButton = vgui.Create("DButton", panel)
+    prevButton:SetPos(50, frame:GetTall() - 100)
+    prevButton:SetSize(150, 40)
+    prevButton:SetText("Previous")
+    prevButton:SetTextColor(whiteColor)
+    prevButton:SetFont("InterFont")
+    prevButton.Paint = function(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, blueColor)
     end
-    submitButton.DoClick = function()
+    prevButton.DoClick = function()
+        PreviousStep()
+    end
+
+    local nextButton = vgui.Create("DButton", panel)
+    nextButton:SetPos(frame:GetWide() - 200, frame:GetTall() - 100)
+    nextButton:SetSize(150, 40)
+    nextButton:SetText("Next")
+    nextButton:SetTextColor(whiteColor)
+    nextButton:SetFont("InterFont")
+    nextButton.Paint = function(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, blueColor)
+    end
+    nextButton.DoClick = function()
+        NextStep()
+    end
+
+    table.insert(steps, panel)
+end
+
+local function CreateModelSelectionStep()
+    local panel = vgui.Create("DPanel", frame)
+    panel:SetSize(frame:GetWide(), frame:GetTall())
+    panel:SetVisible(false)
+    panel.Paint = function(self, w, h)
+        draw.RoundedBox(0, 0, 0, w, h, blackColor)
+    end
+
+    local label = vgui.Create("DLabel", panel)
+    label:SetPos(50, 50)
+    label:SetText("Select your character model:")
+    label:SetSize(450, 35)
+    label:SetTextColor(whiteColor)
+    label:SetFont("InterFont")
+
+    modelSelector = vgui.Create("DScrollPanel", panel)
+    modelSelector:SetPos(50, 100)
+    modelSelector:SetSize(450, 400)
+    modelSelector.Paint = function(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, blueColor)
+    end
+
+    modelPreview = vgui.Create("DModelPanel", panel) -- Create modelPreview here
+    modelPreview:SetPos(550, 100)
+    modelPreview:SetSize(450, 400)
+    modelPreview:SetFOV(60)
+    modelPreview:SetCamPos(Vector(35, 0, 55))
+    modelPreview:SetLookAt(Vector(0, 0, 55))
+    modelPreview:SetModel(defaultModel) -- Set default model initially
+
+    -- Prevent model rotation
+    function modelPreview:LayoutEntity(ent)
+        -- Disable rotation
+    end
+
+    local prevButton = vgui.Create("DButton", panel)
+    prevButton:SetPos(50, frame:GetTall() - 100)
+    prevButton:SetSize(150, 40)
+    prevButton:SetText("Previous")
+    prevButton:SetTextColor(whiteColor)
+    prevButton:SetFont("InterFont")
+    prevButton.Paint = function(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, blueColor)
+    end
+    prevButton.DoClick = function()
+        PreviousStep()
+    end
+
+    local nextButton = vgui.Create("DButton", panel)
+    nextButton:SetPos(frame:GetWide() - 200, frame:GetTall() - 100)
+    nextButton:SetSize(150, 40)
+    nextButton:SetText("Create Character")
+    nextButton:SetTextColor(whiteColor)
+    nextButton:SetFont("InterFont")
+    nextButton.Paint = function(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, blueColor)
+    end
+    nextButton.DoClick = function()
         local selectedModel = modelPreview:GetModel()
         if selectedModel then
             local characterData = {
@@ -216,7 +291,33 @@ local function OpenCharacterCreator()
             notification.AddLegacy("Please select a model.", NOTIFY_ERROR, 5)
         end
     end
+
+    table.insert(steps, panel)
 end
+
+local function OpenCharacterCreator()
+    frame = vgui.Create("DFrame")
+    frame:SetTitle("")
+    frame:SetSize(ScrW(), ScrH())
+    frame:Center()
+    frame:MakePopup()
+    frame.Paint = function(self, w, h)
+        draw.RoundedBox(0, 0, 0, w, h, blackColor)
+    end
+
+    local fields = VAPR_CHARACTER_CREATOR_CONFIG.fields
+    for i, field in ipairs(fields) do
+        CreateStep("Step " .. i .. ": " .. field.name, {field})
+    end
+
+    CreateModelSelectionStep()
+
+    ShowStep(1)
+end
+
+concommand.Add("open_character_creator", function()
+    OpenCharacterCreator()
+end)
 
 net.Receive("VAPR_CharacterCreated", function()
     if frame then
@@ -237,9 +338,4 @@ end)
 hook.Add("InitPostEntity", "VAPR_ClientReady", function()
     net.Start("VAPR_ClientReady")
     net.SendToServer()
-end)
-
--- Register the console command to open the character creator
-concommand.Add("open_character_creator", function()
-    OpenCharacterCreator()
 end)

@@ -1,4 +1,5 @@
 local LifeMat = Material("materials/icons/life.png", "noclamp smooth")
+local HungerMat = Material("materials/icons/hunger.png", "noclamp smooth") -- Nouvelle icône pour la faim
 
 surface.CreateFont("InterFontSmall", {
     font = "Inter",
@@ -24,7 +25,7 @@ surface.CreateFont("Inter", {
     extended = true,
 })
 
-local borderColor = Color(0, 122, 204, 255)
+local borderColor = Color(59, 130, 246, 255)
 
 local function drawBorderedBox(x, y, width, height, bgColor, bColor)
     draw.RoundedBox(6, x, y, width, height, bgColor)
@@ -102,16 +103,48 @@ hook.Add("HUDPaint", "DrawCustomHUD", function()
             local backgroundWidth = 210
             local backgroundHeight = 30
             local barX = 55
-            local barY = ScrH() - 115
-            local backgroundY = ScrH() - 120
+            local barY = ScrH() - 135
+            local backgroundY = ScrH() - 140
             local iconSize = 30
             local iconX = 50
-            local iconY = ScrH() - 122
+            local iconY = ScrH() - 142
 
             draw.RoundedBox(roundedBoxRadius, 50, backgroundY, backgroundWidth, backgroundHeight, Color(27, 40, 56, 255))
             draw.RoundedBox(roundedBoxRadius, barX, barY, barWidth, barHeight, Color(59, 130, 246, 255))
     
             surface.SetMaterial(LifeMat)
+            surface.SetDrawColor(255, 255, 255, 255)
+            surface.DrawTexturedRect(iconX, iconY, iconSize, iconSize)
+        end
+    end)
+
+    net.Receive("UpdateHunger", function()
+        local hunger = net.ReadInt(32)
+        LocalPlayer():SetNWInt("Hunger", hunger)
+    end)
+    
+    hook.Add("HUDPaint", "DrawHungerBar", function()
+        if NextHUD_config.ShowHungerBar then
+            local hunger = LocalPlayer():GetNWInt("Hunger", 100) -- Assurez-vous que la valeur de la faim est correctement synchronisée avec le serveur
+            local roundedBoxRadius = 15
+            local barWidth = math.Clamp(hunger, 0, 100) * 2
+            local barHeight = 20
+            local backgroundWidth = 210
+            local backgroundHeight = 30
+            local barX = 55
+            local barY = ScrH() - 95
+            local backgroundY = ScrH() - 100
+            local iconSize = 30
+            local iconX = 50
+            local iconY = ScrH() - 102
+    
+            -- Dessiner le fond de la barre de faim
+            draw.RoundedBox(roundedBoxRadius, 50, backgroundY, backgroundWidth, backgroundHeight, Color(27, 40, 56, 255))
+            -- Dessiner la barre de faim
+            draw.RoundedBox(roundedBoxRadius, barX, barY, barWidth, barHeight, Color(59, 130, 246, 255))
+    
+            -- Dessiner l'icône de faim
+            surface.SetMaterial(HungerMat)
             surface.SetDrawColor(255, 255, 255, 255)
             surface.DrawTexturedRect(iconX, iconY, iconSize, iconSize)
         end
@@ -125,8 +158,8 @@ hook.Add("HUDPaint", "DrawCustomHUD", function()
         local backgroundWidth = 210
         local backgroundHeight = 30
         local barX = 55
-        local barY = screenH - 75
-        local backgroundY = screenH - 80
+        local barY = screenH - 55
+        local backgroundY = screenH - 60
 
         draw.RoundedBox(roundedBoxRadius, 50, backgroundY, backgroundWidth, backgroundHeight, Color(27, 40, 56, 255))
         draw.RoundedBox(roundedBoxRadius, barX, barY, barWidth, barHeight, Color(59, 130, 246, 255))

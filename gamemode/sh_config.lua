@@ -253,6 +253,7 @@ NextHUD_config = {
     ShowHealthBar = true,
     ShowArmorBar = true,
     ShowAmmo = true,
+    ShowHungerBar = true,
     ShowVehicleHUD = true,
     Show3DDoorInfo = true,
     ShowGesturesMenu = true
