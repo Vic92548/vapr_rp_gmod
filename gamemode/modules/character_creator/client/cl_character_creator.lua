@@ -24,6 +24,8 @@ local function ShowStep(step)
     end
 end
 
+
+
 local function PreviousStep()
     if currentStep > 1 then
         currentStep = currentStep - 1

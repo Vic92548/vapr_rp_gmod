@@ -14,6 +14,7 @@ include("modules/shop/init.lua")
 include("modules/character_creator/init.lua")
 include("modules/weapon_hud/init.lua")
 include("modules/next_hud/init.lua")
+include("modules/hunger_system/init.lua")
 
 function GM:Initialize()
     self.BaseClass.Initialize(self)
