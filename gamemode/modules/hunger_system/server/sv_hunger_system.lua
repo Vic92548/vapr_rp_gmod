@@ -13,9 +13,13 @@ local function DecayHunger()
     for _, ply in pairs(player.GetAll()) do
         if ply:Alive() then
             local hunger = ply:GetNWInt("Hunger", 100) - VAPR_HungerConfig.hungerDecrease
-            hunger = math.max(hunger, 0)  
+            hunger = math.max(hunger, 0) 
 
             ply:SetNWInt("Hunger", hunger)
+
+            net.Start("UpdateHunger")
+            net.WriteInt(hunger, 32)
+            net.Send(ply)
 
             if hunger <= 0 then
                 ply:TakeDamage(VAPR_HungerConfig.damagePerSecond)
@@ -26,3 +30,4 @@ end
 
 hook.Add("PlayerSpawn", "InitializeHunger", InitializeHunger)
 timer.Create("DecayHungerTimer", VAPR_HungerConfig.decayInterval, 0, DecayHunger)
+

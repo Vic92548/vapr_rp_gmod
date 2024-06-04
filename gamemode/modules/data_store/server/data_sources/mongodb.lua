@@ -1,5 +1,4 @@
 local mongo = require("gmod-mongodb")
-local DataStore = include("data_store.lua")
 local MongoDBStore = setmetatable({}, {__index = DataStore})
 
 function MongoDBStore:init(config)

@@ -1,5 +1,4 @@
 require("mysqloo")
-local DataStore = include("data_store.lua")
 local MySQLStore = setmetatable({}, {__index = DataStore})
 
 function MySQLStore:init(config)

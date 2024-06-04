@@ -1,10 +1,12 @@
 -- data_manager.lua
-local DataManager = {}
+DataManager = {}
 DataManager.__index = DataManager
+
+local sqlite = include("data_sources/sqlite.lua")
 
 local function getStore(storeType)
     if storeType == "sqlite" then
-        return include("data_sources/sqlite.lua")
+        return sqlite
     elseif storeType == "mysql" then
         return include("data_sources/mysql.lua")
     elseif storeType == "mongodb" then
@@ -16,10 +18,10 @@ end
 
 function DataManager:new(storeType, config)
     local Store = getStore(storeType)
-    local obj = Store:new()
-    obj:init(config)
-    setmetatable(obj, self)
-    return obj
+    PrintTable(Store)
+    Store:init(config)
+    setmetatable(Store, self)
+    return Store
 end
 
 function DataManager:save(tableName, data)

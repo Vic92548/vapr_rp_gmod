@@ -118,14 +118,15 @@ hook.Add("HUDPaint", "DrawCustomHUD", function()
         end
     end)
 
+    -- cl_hunger.lua
     net.Receive("UpdateHunger", function()
         local hunger = net.ReadInt(32)
         LocalPlayer():SetNWInt("Hunger", hunger)
     end)
     
     hook.Add("HUDPaint", "DrawHungerBar", function()
-        if NextHUD_config.ShowHungerBar then
-            local hunger = LocalPlayer():GetNWInt("Hunger", 100) -- Assurez-vous que la valeur de la faim est correctement synchronisée avec le serveur
+        if NextHUD_config and NextHUD_config.ShowHungerBar then
+            local hunger = LocalPlayer():GetNWInt("Hunger", 100) 
             local roundedBoxRadius = 15
             local barWidth = math.Clamp(hunger, 0, 100) * 2
             local barHeight = 20
@@ -137,19 +138,19 @@ hook.Add("HUDPaint", "DrawCustomHUD", function()
             local iconSize = 30
             local iconX = 50
             local iconY = ScrH() - 102
-    
-            -- Dessiner le fond de la barre de faim
+       
             draw.RoundedBox(roundedBoxRadius, 50, backgroundY, backgroundWidth, backgroundHeight, Color(27, 40, 56, 255))
-            -- Dessiner la barre de faim
+            
             draw.RoundedBox(roundedBoxRadius, barX, barY, barWidth, barHeight, Color(59, 130, 246, 255))
     
-            -- Dessiner l'icône de faim
-            surface.SetMaterial(HungerMat)
-            surface.SetDrawColor(255, 255, 255, 255)
-            surface.DrawTexturedRect(iconX, iconY, iconSize, iconSize)
+            if HungerMat then
+                surface.SetMaterial(HungerMat)
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.DrawTexturedRect(iconX, iconY, iconSize, iconSize)
+            end
         end
     end)
-    
+        
     if NextHUD_config.ShowArmorBar then
         local armor = player:Armor()
         local roundedBoxRadius = 15

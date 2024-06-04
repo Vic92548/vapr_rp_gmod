@@ -10,7 +10,9 @@ AddCSLuaFile("shared/shared.lua")
 
 include("sh_config.lua")
 include("sv_config.lua")
-include("player.lua")
+
+include("modules/data_store/init.lua")
+VAPR_DataManager = DataManager:new(VAPR_DATA_STORE_CONFIG.data_source, VAPR_DATA_STORE_CONFIG.db)
 
 
 

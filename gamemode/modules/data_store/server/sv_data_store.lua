@@ -1,4 +1,4 @@
-local DataStore = {}
+DataStore = {}
 DataStore.__index = DataStore
 
 function DataStore:new()

@@ -1,43 +1,72 @@
-local sqlite = require("lsqlite3")
-local DataStore = include("data_store.lua")
 local SQLiteStore = setmetatable({}, {__index = DataStore})
 
 function SQLiteStore:init(config)
-    self.db = sqlite.open(config.db_path)
+    self.config = config
+end
+
+function SQLiteStore:createTable(tableName)
+    local query = "CREATE TABLE IF NOT EXISTS " .. tableName .. " (identifier TEXT PRIMARY KEY, json_data TEXT)"
+    local result = sql.Query(query)
+    if result == false or result == nil then
+        print("Failed to create table " .. tableName .. ": " .. sql.LastError())
+    else
+        print("Table " .. tableName .. " created successfully.")
+    end
 end
 
 function SQLiteStore:save(tableName, data)
-    local stmt = self.db:prepare("INSERT OR REPLACE INTO " .. tableName .. " (identifier, json_data) VALUES (?, ?)")
-    stmt:bind_values(data.identifier, util.TableToJSON(data))
-    stmt:step()
-    stmt:finalize()
+    local function attemptSave()
+        local query = "INSERT OR REPLACE INTO " .. tableName .. " (identifier, json_data) VALUES (%s, %s)"
+        query = string.format(query, sql.SQLStr(data.identifier), sql.SQLStr(util.TableToJSON(data)))
+        local result = sql.Query(query)
+        return result
+    end
+
+    local result = attemptSave()
+    print("RESULT:")
+    print(result)
+    if result == false then
+        local lastError = sql.LastError()
+        if string.find(lastError, "no such table") then
+            print("Table " .. tableName .. " does not exist. Creating table...")
+            self:createTable(tableName)
+            result = attemptSave()
+            if result == false or result == nil then
+                print("Failed to save data after creating table: " .. sql.LastError())
+                return false
+            else
+                print("Data saved successfully after creating table " .. tableName .. ".")
+                return true
+            end
+        else
+            print("Failed to save data: " .. lastError)
+            return false
+        end
+    else
+        print("Data saved successfully.")
+        return true
+    end
 end
 
 function SQLiteStore:load(tableName, identifier, callback)
-    local query = "SELECT json_data FROM " .. tableName .. " WHERE identifier = ?"
-    local stmt = self.db:prepare(query)
-    stmt:bind_values(identifier)
-    local result = nil
-    for row in stmt:nrows() do
-        result = util.JSONToTable(row.json_data)
+    local query = string.format("SELECT json_data FROM %s WHERE identifier = %s", tableName, sql.SQLStr(identifier))
+    local result = sql.QueryRow(query)
+    if result then
+        callback(util.JSONToTable(result.json_data))
+    else
+        callback(nil)
     end
-    stmt:finalize()
-    callback(result)
 end
 
 function SQLiteStore:query(tableName, queryTable, callback)
-    local queryString = "SELECT * FROM " .. tableName .. " WHERE "
     local conditions = {}
     for key, value in pairs(queryTable) do
-        table.insert(conditions, key .. " = '" .. value .. "'")
+        table.insert(conditions, string.format("%s = %s", key, sql.SQLStr(value)))
     end
-    queryString = queryString .. table.concat(conditions, " AND ")
-
-    local results = {}
-    for row in self.db:nrows(queryString) do
-        table.insert(results, row)
-    end
-    callback(results)
+    local queryString = string.format("SELECT * FROM %s WHERE %s", tableName, table.concat(conditions, " AND "))
+    
+    local results = sql.Query(queryString)
+    callback(results or {})
 end
 
 return SQLiteStore

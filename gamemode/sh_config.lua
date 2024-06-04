@@ -262,6 +262,5 @@ NextHUD_config = {
 VAPR_HungerConfig = {
     damagePerSecond = 0, -- Damage per second when hunger is at 0
     decayInterval = 1,   -- Interval in seconds for hunger reduction
-    hungerDecrease = 360   -- Hunger points lost per interval
+    hungerDecrease = 1   -- Hunger points lost per interval
 }
-
